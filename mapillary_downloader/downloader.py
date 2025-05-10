@@ -1,6 +1,7 @@
 import os
 import csv
 import requests
+from mapillary_downloader.utils import validate_bbox
 from typing import List, Optional
 
 class MapillaryDownloader:
@@ -24,6 +25,7 @@ class MapillaryDownloader:
     
     def get_images_in_bbox(self, bbox: str, fields: str = "id") -> List[str]:
         """Fetch image IDs within a bounding box."""
+        assert validate_bbox(bbox), "Invalid bbox! First two lat, long need to be smaller than the next lat, long"
         params = {
             "bbox": bbox,
             "fields": fields
