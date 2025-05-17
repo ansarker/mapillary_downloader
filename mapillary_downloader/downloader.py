@@ -33,11 +33,23 @@ class MapillaryDownloader:
         data = self._make_api_request("images", params)
         return [img["id"] for img in data["data"]]
     
+    def get_images_by_user_in_bbox(self, username: str, bbox: str, fields: str = "id") -> List[str]:
+        assert validate_bbox(bbox), "Invalid bbox! First two lat, long need to be smaller than the next lat, long"
+        params = {
+            "creator_username": username,
+            "bbox": bbox,
+            "fields": fields,
+        }
+
+        data = self._make_api_request("images", params)
+        print('Username datas: ', data)
+        return [img["id"] for img in data["data"]]
+    
     def download_image(self, image_id: str, output_dir: str = ".") -> None:
         """Download a single image by ID."""
         metadata = self._make_api_request(
             endpoint=image_id,
-            params={"fields": "thumb_original_url,computed_geometry,captured_at,detections"}
+            params={"fields": "thumb_original_url,computed_geometry,captured_at"}
         )
         
         if "thumb_original_url" not in metadata:

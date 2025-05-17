@@ -13,6 +13,11 @@ def parse_args():
         help="Mapillary API access token (required)"
     )
     parser.add_argument(
+        "--username",
+        required=False,
+        help="Username to download by specific user"
+    )
+    parser.add_argument(
         "--bbox",
         required=True,
         help="Bounding box as 'min_lon,min_lat,max_lon,max_lat'"
@@ -25,7 +30,7 @@ def parse_args():
     parser.add_argument(
         "--limit",
         type=int,
-        default=None,
+        default=10000,
         help="Maximum number of images to download"
     )
     return parser.parse_args()
@@ -36,10 +41,15 @@ def main():
     Path(args.output).mkdir(parents=True, exist_ok=True)
     
     downloader = MapillaryDownloader(args.token)
-    print(f"Fetching images in bbox: {args.bbox}")
     
     try:
-        image_ids = downloader.get_images_in_bbox(args.bbox)
+        if args.username:
+            print(f"Fetching images by user @{args.username} in bbox: {args.bbox}")
+            image_ids = downloader.get_images_by_user_in_bbox(username=args.username, bbox=args.bbox)
+        else:
+            print(f"Fetching images in bbox: {args.bbox}")
+            image_ids = downloader.get_images_in_bbox(args.bbox)
+        
         if args.limit:
             image_ids = image_ids[:args.limit]
         
